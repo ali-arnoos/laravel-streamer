@@ -65,6 +65,21 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Per-stream Redis connections
+    |--------------------------------------------------------------------------
+    |
+    | Stream name => connection name, for streams that live on another Redis
+    | than redis_connection. Emitting, listening, archiving, purging and retrying
+    | all follow it. Streams listened to together must share one connection.
+    | The failed-messages set and replay history stay on redis_connection.
+    |
+    | 'connections' => ['item-changed' => 'syncer'],
+    |
+    */
+    'connections' => [],
+
+    /*
+    |--------------------------------------------------------------------------
     | Streamer event domain
     |--------------------------------------------------------------------------
     |

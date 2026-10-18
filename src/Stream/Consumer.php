@@ -88,4 +88,9 @@ class Consumer
 
         return $this->redis()->xClaim($this->stream->getName(), $this->group, $this->consumer, $idleTime, $ids);
     }
+
+    protected function redisConnectionName(): string
+    {
+        return $this->stream->getConnectionName();
+    }
 }

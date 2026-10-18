@@ -34,6 +34,14 @@ class Stream
         return $this->name;
     }
 
+    /**
+     * Redis connection this stream lives on (see streamer.connections).
+     */
+    public function getConnectionName(): string
+    {
+        return static::connectionFor($this->name);
+    }
+
     public function getNewEntriesKey(): string
     {
         return self::NEW_ENTRIES;
@@ -249,5 +257,10 @@ class Stream
         }
 
         return $result;
+    }
+
+    protected function redisConnectionName(): string
+    {
+        return $this->getConnectionName();
     }
 }

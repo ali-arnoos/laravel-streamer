@@ -25,15 +25,20 @@ class MultiStream
 
     private string $group;
 
+    private string $connection;
+
+    /**
+     * @throws \Prwnr\Streamer\Exceptions\MixedStreamConnectionsException when the streams
+     *         are on different Redis connections: they are read in one command
+     */
     public function __construct(array $streams, string $group = '', string $consumer = '')
     {
         $this->streams = new Collection();
 
-        foreach ($streams as $name) {
-            if (!$name || !is_string($name)) {
-                continue;
-            }
+        $names = array_filter($streams, static fn ($name): bool => $name && is_string($name));
+        $this->connection = static::sharedConnectionFor($names);
 
+        foreach ($names as $name) {
             $stream = new Stream($name);
             $this->streams->put($name, $stream);
 
@@ -152,6 +157,11 @@ class MultiStream
                 "Not all messages were acknowledged. Streams affected: " . implode(', ', $notAcknowledged)
             );
         }
+    }
+
+    protected function redisConnectionName(): string
+    {
+        return $this->connection;
     }
 
     private function parseResult($result): array
