@@ -1,8 +1,11 @@
 {
-    "name": "prwnr/laravel-streamer",
-    "description": "Events streaming package for Laravel that uses Redis 5 streams",
+    "name": "miswag/laravel-streamer",
+    "description": "Events streaming package for Laravel that uses Redis 5 streams (Miswag fork of prwnr/laravel-streamer with per-stream Redis connections)",
     "type": "library",
     "license": "MIT",
+    "replace": {
+        "prwnr/laravel-streamer": "self.version"
+    },
     "authors": [
         {
             "name": "Rafal Purwin",
