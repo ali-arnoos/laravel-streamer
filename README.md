@@ -5,6 +5,10 @@ package utilizes all main commands of Redis 5.0 Streams providing a simple usage
 
 Main concept of this package is to provide easy way of emitting new events from your application and to allow listening to them in your other applications that are using same Redis server.
 
+> **Miswag fork.** `miswag/laravel-streamer` is a fork of [prwnr/laravel-streamer](https://github.com/prwnr/laravel-streamer)
+> that adds [per-stream Redis connections](#per-stream-redis-connections). It `replace`s `prwnr/laravel-streamer` and keeps
+> the `Prwnr\Streamer` namespace, so it is a drop-in swap.
+
 # Installation
 1. Install package via composer command `composer require prwnr/laravel-streamer` or by adding it to your composer.json file with version.
 2. Discover the package
@@ -31,6 +35,27 @@ There are two main ends of this package usage - emiting new event and listening 
 | ^8.1&#124;^8.2                               | 10.x&#124;11.x&#124;12.x            | ^4.4     | PhpRedis     | 6.0&#124;7.0 |
 | ^8.1&#124;^8.2&#124;^8.3&#124;^8.4           | 10.x&#124;11.x&#124;12.x            | ^4.6     | PhpRedis     | 6.0&#124;7.0 |
 | ^8.1&#124;^8.2&#124;^8.3&#124;^8.4&#124;^8.5 | 10.x&#124;11.x&#124;12.x&#124;^13.x | ^4.7     | PhpRedis     | 6.0&#124;7.0 |
+
+### Per-stream Redis connections
+
+Every stream uses `streamer.redis_connection` unless `streamer.connections` maps it to another
+connection from `config/database.php`:
+
+```php
+'redis_connection' => 'default',
+
+'connections' => [
+    'item-changed' => 'syncer',
+],
+```
+
+Emitting, listening (including consumer groups), archiving, restoring, purging and retrying a failed
+message all use the stream's mapped connection. A few things to keep in mind:
+
+- Streams you listen to together (`streamer:listen a,b`) are read in one command, so they must share one
+  connection. Mixing connections throws `MixedStreamConnectionsException`. Run one listener per connection instead.
+- The failed-messages set and the replay history stay on `redis_connection`.
+- The emitter and every listener must map the stream to the same Redis.
   
 ### Emiting new events
 
